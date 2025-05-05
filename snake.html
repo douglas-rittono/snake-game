@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jogo da cobrinha</title>
+</head>
+<body>
+ 
+	<label style="font-size:20px">Pontuação: <label id="points" style="color:red;font-size:20px">0</label></label>
+	</br>
+    <canvas id="stage" width="600" height="600"></canvas>
+    <script type="text/javascript">
+        const eatSoundFile = 'EatSound.wav';
+		const gameOverSound = 'GameOverSound.wav';
+		const moveSound = 'MoveSound.mp3';
+		var valideKey=[37,38,39,40];
+		var lastKey=0;
+		var points=0;
+		var gameOver=false;
+		var startedGame=false;
+		
+        window.onload = function(){
+			
+            var stage = document.getElementById('stage');
+            var ctx = stage.getContext("2d");
+            document.addEventListener("keydown", keyPush);			
+            setInterval(game, 80);
+			
+            const vel = 1;
+ 
+            var vx = vy = 0;
+            var px =10;
+            var py = 15;
+            var tp = 30;
+            var qp = 20;
+            var ax=ay=15;
+ 
+            var trail = [];
+            tail = 5;
+ 
+            function game(){
+				document.getElementById("points").innerHTML = points;
+                px += vx;
+                py += vy;
+                if (px <0) {
+                    px = qp-1;
+                }
+                if (px > qp-1) {
+                    px = 0;
+                }
+                if (py < 0) {
+                    py = qp-1;
+                }
+                if (py > qp-1) {
+                    py = 0;
+                }
+ 
+                ctx.fillStyle = "black";
+                ctx.fillRect(0,0, stage.width, stage.height);
+ 
+                ctx.fillStyle = "red";
+                ctx.fillRect(ax*tp, ay*tp, tp,tp);
+ 
+                ctx.fillStyle = "gray";
+                for (var i = 0; i < trail.length; i++) {
+                    ctx.fillRect(trail[i].x*tp, trail[i].y*tp, tp-1,tp-1);
+                    if (trail[i].x == px && trail[i].y == py && startedGame)
+                    {
+                        vx = vy=0;
+                        tail =5;	
+						gameOver=true;
+						startedGame=false;
+                    }
+                }
+ 
+                trail.push({x:px,y:py })
+                while (trail.length > tail) {					
+                    trail.shift();
+                }
+				 
+                if (ax==px && ay==py){
+					playSound(eatSoundFile);
+                    tail++;
+					points++;
+                    ax = Math.floor(Math.random()*qp);
+                    ay = Math.floor(Math.random()*qp);
+                }
+				
+				if(gameOver){
+					playSound(gameOverSound);
+					gameOver=false;
+					lastKey=0;
+				}
+ 
+            }
+			
+			function playSound(url) {
+			  const audio = new Audio(url);
+			  audio.play();
+			}
+ 
+            function keyPush(event){
+
+				if(valideKey.includes(event.keyCode)){
+					if(!startedGame){
+						startedGame=true;
+						points=0;
+					}
+					switch (event.keyCode) {
+						case 37: // Left
+							if(lastKey!=39 && lastKey!=37){
+								vx = -vel;
+								vy = 0;
+								lastKey=37;
+								playSound(moveSound);
+							}
+							break;
+						case 38: // up
+							if(lastKey!=40 && lastKey!=38){
+								vx = 0;
+								vy = -vel;
+								lastKey=38;
+								playSound(moveSound);
+							}
+							break;
+						case 39: // right
+							if(lastKey!=37 && lastKey!=39){
+								vx = vel;
+								vy = 0;
+								lastKey=39;
+								playSound(moveSound);
+							}
+							break;
+						case 40: // down
+							if(lastKey!=38 && lastKey!=40){
+								vx = 0;
+								vy = vel;
+								lastKey=40;
+								playSound(moveSound);
+							}
+							break;          
+						default:                        
+							break;
+					}
+				}
+				
+ 
+            }
+ 
+        }
+ 
+    </script>
+</body>
+</html>

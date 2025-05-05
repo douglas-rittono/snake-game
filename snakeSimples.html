@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Jogo da cobrinha SESI</title>
+</head>
+<body>
+    <canvas id="stage" width="600" height="600"></canvas>
+    <script type="text/javascript">
+	
+	window.onload = function(){
+		//informações do contexto
+		var stage = document.getElementById('stage');
+        var ctx = stage.getContext("2d");
+		//inclusão do evento keypush
+		document.addEventListener("keydown", keyPush);	
+		
+		//chama o método a cada x milisegundos
+		setInterval(game, 80);
+		
+		//velocidade constante, quantas casas vai andar a cada execução
+		const vel = 1;
+		
+		//velocidade da cobra, pra onde ela está andando
+		var vx = vy = 0;
+		
+		//ponto inicial da cobra, vamos criar fixo
+		var px = 10;
+		var py = 15;
+		
+		//tamanho do quadrado
+		var tp = 30;
+		
+		//quantidade de peças
+		var qp = 20;
+		
+		//ponto inicial da maçã		
+		var ax=ay=15;
+		
+		//criando o rastro da cobra
+		var trail = [];
+		//calda da cobra
+		tail = 5;
+		
+		
+		function game(){
+			
+		//para que cada vez que ela chegar no fim ela volte pro outro lado
+		px+=vx;
+		py+=vy;	
+		
+		if(px<0){
+			px = qp-1;
+		}
+		if(px>qp-1){
+			px=0;
+		}
+		if(py<0){
+			py = qp-1;
+		}
+		if(py>qp-1){
+			py=0;
+		}
+		
+		//pintura do fundo do jogo
+		ctx.fillStyle = "black";
+        ctx.fillRect(0,0, stage.width, stage.height);
+		
+		//pintura da maçã - é o tamanho da peça vezes a posição
+		ctx.fillStyle = "red";
+		ctx.fillRect(ax*tp, ay*tp, tp, tp);
+		
+		//pintando a cobra
+		ctx.fillStyle = "gray";
+		//pintar o rastro com um laço
+		for (var i = 0; i < trail.length; i++) {
+			//-1 pra ficar um espaçinho entre os quadrados
+            ctx.fillRect(trail[i].x*tp, trail[i].y*tp, tp-1,tp-1);
+			//verifica se a cabeça está batendo em algum lugar do corpo
+			if (trail[i].x == px && trail[i].y == py)
+            {
+				//game over
+                vx = vy=0;
+                tail =5;	
+			}
+		}
+		
+		//caso não bateu vamos fazer ela andar, coloca a posição atual na ultima posição do array
+		trail.push({x:px,y:py});
+		//se o rastro da cobra for maior que o tamanho dela nós vamos tirar o primeiro elemento da fila
+		while(trail.length>tail){
+			trail.shift();
+		}
+		
+		//vamos validar se a posição da cabeça em x e y é a mesma posição da maçã
+		if(ax==px && ay==py){
+			//adiciona 1 no tamanho da calda
+			tail++;
+			//coloca a maçã em outra posição, arredonda pra baixo
+			ax = Math.floor(Math.random()*qp);
+			ay = Math.floor(Math.random()*qp);			
+		}
+		}
+		function keyPush(event){
+				switch (event.keyCode) {
+						case 37: // Left							
+								vx = -vel;
+								vy = 0;
+							break;
+						case 38: // up
+								vx = 0;
+								vy = -vel;
+							break;
+						case 39: // right
+								vx = vel;
+								vy = 0;
+							break;
+						case 40: // down							
+								vx = 0;
+								vy = vel;								
+							break;          
+						default:                        
+							break;
+					}
+				}
+				
+ 
+          }
+	
+	
+	
+	</script>
+</body>
+</html>
